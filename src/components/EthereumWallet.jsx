@@ -13,40 +13,15 @@ function EthereumWallet({
   visiblePrivateKeys,
   setVisiblePrivateKeys,
 }) {
-  const generateWallets = async (count = 1) => {
+  const newWallets = [];
+  const generateWallets = async () => {
     if (!mnemonic) return;
-
+    
     setIsLoading(true);
     try {
-      const newWallets = [];
-
       // Create multiple wallets from the same mnemonic with different derivation paths
-      for (let i = 0; i < count; i++) {
-        const path = `m/44'/60'/0'/0/${i}`;
-        const wallet = ethers.Wallet.fromMnemonic(mnemonic, path);
-
-        newWallets.push({
-          index: i,
-          address: wallet.address,
-          path,
-          privateKey: wallet.privateKey,
-        });
-      }
-
-      setWallets(newWallets);
-    } catch (error) {
-      console.error("Error generating Ethereum wallets:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const generateOneMoreWallet = async () => {
-    if (!mnemonic || wallets.length === 0) return;
-
-    setIsGeneratingMore(true);
-    try {
       const newIndex = wallets.length;
+
       const path = `m/44'/60'/0'/0/${newIndex}`;
       const wallet = ethers.Wallet.fromMnemonic(mnemonic, path);
 
@@ -60,11 +35,13 @@ function EthereumWallet({
         },
       ]);
     } catch (error) {
-      console.error("Error generating additional Ethereum wallet:", error);
+      console.error("Error generating Ethereum wallets:", error);
     } finally {
-      setIsGeneratingMore(false);
+      setIsLoading(false);
     }
   };
+
+  
 
   const copyAddress = (address) => {
     navigator.clipboard.writeText(address);
@@ -90,7 +67,7 @@ function EthereumWallet({
           <p>Generate Ethereum wallets from your seed phrase</p>
 
           <button
-            onClick={() => generateWallets(1)}
+            onClick={() => generateWallets()}
             disabled={!mnemonic || isLoading}
             className="wallet-button"
           >
@@ -108,7 +85,7 @@ function EthereumWallet({
             <h3>Ethereum Wallets</h3>
             <div className="wallet-header-buttons">
               <button
-                onClick={() => generateOneMoreWallet()}
+                onClick={() => generateWallets()}
                 disabled={isGeneratingMore}
                 className="add-wallet-button"
                 title="Add one more wallet"

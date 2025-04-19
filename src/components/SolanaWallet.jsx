@@ -15,53 +15,18 @@ function SolanaWallet({
   visiblePrivateKeys,
   setVisiblePrivateKeys,
 }) {
-  const generateWallets = async (count = 1) => {
+  const newWallets = [];
+  const generateWallets = async () => {
     if (!mnemonic) return;
 
     setIsLoading(true);
     try {
       // Convert mnemonic to seed
       const seed = await bip39.mnemonicToSeed(mnemonic);
-      const newWallets = [];
-
-      // Generate multiple wallets with different account indices
-      for (let i = 0; i < count; i++) {
-        // Derive the ED25519 private key using the path m/44'/501'/i'/0'
-        const derivedPath = `m/44'/501'/${i}'/0'`;
-        const derivedSeed = derivePath(derivedPath, seed.toString("hex")).key;
-
-        // Create a keypair from the derived seed
-        const keypair = solanaWeb3.Keypair.fromSeed(derivedSeed);
-
-        // Get the public key (wallet address)
-        const publicKey = keypair.publicKey.toString();
-
-        newWallets.push({
-          index: i,
-          address: publicKey,
-          path: derivedPath,
-          publicKey: keypair.publicKey,
-          secretKey: keypair.secretKey,
-        });
-      }
-
-      setWallets(newWallets);
-    } catch (error) {
-      console.error("Error generating Solana wallets:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const generateOneMoreWallet = async () => {
-    if (!mnemonic || wallets.length === 0) return;
-
-    setIsGeneratingMore(true);
-    try {
       const newIndex = wallets.length;
-      const seed = await bip39.mnemonicToSeed(mnemonic);
+      // Generate multiple wallets with different account indices
 
-      // Derive the ED25519 private key using the next path
+      // Derive the ED25519 private key using the path m/44'/501'/i'/0'
       const derivedPath = `m/44'/501'/${newIndex}'/0'`;
       const derivedSeed = derivePath(derivedPath, seed.toString("hex")).key;
 
@@ -82,9 +47,9 @@ function SolanaWallet({
         },
       ]);
     } catch (error) {
-      console.error("Error generating additional Solana wallet:", error);
+      console.error("Error generating Solana wallets:", error);
     } finally {
-      setIsGeneratingMore(false);
+      setIsLoading(false);
     }
   };
 
@@ -119,7 +84,7 @@ function SolanaWallet({
           <p>Generate Solana wallets from your seed phrase</p>
 
           <button
-            onClick={() => generateWallets(1)}
+            onClick={() => generateWallets()}
             disabled={!mnemonic || isLoading}
             className="wallet-button"
             style={{ background: "linear-gradient(135deg, #9945FF, #14F195)" }}
@@ -138,7 +103,7 @@ function SolanaWallet({
             <h3>Solana Wallets</h3>
             <div className="wallet-header-buttons">
               <button
-                onClick={() => generateOneMoreWallet()}
+                onClick={() => generateWallets()}
                 disabled={isGeneratingMore}
                 className="add-wallet-button"
                 title="Add one more wallet"
