@@ -2,7 +2,9 @@
 
 A secure, client-side cryptocurrency wallet generator that creates Ethereum and Solana wallets from a BIP39 mnemonic seed phrase.
 
-![Wallet Demo](https://user-images.githubusercontent.com/placeholder/crypto-wallet-demo.png)
+## Live Demo
+
+Try the application live at: [https://web3-wallet-three.vercel.app/](https://web3-wallet-three.vercel.app/)
 
 ## Features
 
